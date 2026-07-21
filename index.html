@@ -51,7 +51,7 @@
 
   /* ---------- header ---------- */
   header{
-    position:sticky; top:0; z-index:50;
+    position:sticky; top:0; z-index:100;
     background:linear-gradient(180deg, var(--purple-deep), var(--purple-deeper));
     color:#fff;
     box-shadow:var(--shadow);
@@ -175,7 +175,7 @@
   .fc-mini-actions a{ font-size:12px; color:var(--gold); text-decoration:none; font-weight:700; }
   .empty-state{ padding:40px 20px; text-align:center; color:var(--ink-soft); font-size:14px; }
 
-  #map{ border-radius:var(--radius); overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow); }
+  #map{ border-radius:var(--radius); overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow); position:relative; isolation:isolate; }
   .leaflet-popup-content-wrapper{ border-radius:12px; font-family:'Tajawal',sans-serif; direction:rtl; }
   .popup-title{ font-weight:700; color:var(--purple-deep); font-size:15px; margin:0 0 6px; }
   .popup-row{ font-size:12.5px; color:var(--ink-soft); margin:2px 0; }
@@ -216,7 +216,7 @@
   .footer-inner .fl{ font-size:12.5px; display:block; }
   .footer-text-col{ display:flex; flex-direction:column; gap:4px; }
   .footer-logos{ display:flex; align-items:center; gap:16px; }
-  .footer-logo{ height:42px; width:auto; display:block; opacity:0.82; transition:opacity .2s ease; }
+  .footer-logo{ height:42px; width:auto; display:block; opacity:0.55; transition:opacity .2s ease; }
   .footer-logo:hover{ opacity:1; }
   .footer-logo.ministry{ height:52px; }
   footer a{ color:var(--gold-light); }
@@ -282,6 +282,16 @@
     .form-grid{ grid-template-columns:1fr; }
     .stats-row{ grid-template-columns:repeat(3,1fr); }
     .hero h1{ font-size:30px; }
+  }
+  @media (max-width: 560px){
+    .header-inner{ flex-wrap:wrap; gap:8px; padding:8px 14px; }
+    .brand-logos img{ height:34px; }
+    .brand-logos img.ministry{ height:40px; }
+    .brand-text .ar-name{ font-size:13px; }
+    .brand-text .sub{ display:none; }
+    .header-actions{ gap:6px; flex-wrap:wrap; }
+    .header-actions .btn{ padding:8px 14px; font-size:12.5px; }
+    .icon-btn{ width:32px; height:32px; font-size:14px; }
   }
   @media (prefers-reduced-motion: reduce){ *{ transition:none !important; scroll-behavior:auto !important; } }
 </style>
