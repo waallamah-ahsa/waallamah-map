@@ -285,14 +285,16 @@
     .hero h1{ font-size:30px; }
   }
   @media (max-width: 560px){
-    .header-inner{ flex-wrap:wrap; gap:8px; padding:8px 14px; }
-    .brand-logos img{ height:34px; }
-    .brand-logos img.ministry{ height:40px; }
-    .brand-text .ar-name{ font-size:13px; }
+    .header-inner{ flex-direction:column; align-items:center; gap:10px; padding:12px 16px; }
+    .brand{ flex-direction:column; align-items:center; text-align:center; gap:8px; }
+    .brand-logos img{ height:32px; }
+    .brand-logos img.ministry{ height:38px; }
+    .brand-text{ align-items:center; }
+    .brand-text .ar-name{ font-size:13.5px; text-align:center; }
     .brand-text .sub{ display:none; }
-    .header-actions{ gap:6px; flex-wrap:wrap; }
-    .header-actions .btn{ padding:8px 14px; font-size:12.5px; }
-    .icon-btn{ width:32px; height:32px; font-size:14px; }
+    .header-actions{ width:100%; gap:8px; }
+    .header-actions .btn{ flex:1; justify-content:center; padding:9px 10px; font-size:12.5px; white-space:nowrap; }
+    .icon-btn{ width:32px; height:32px; font-size:14px; flex:0 0 auto; }
   }
   @media (prefers-reduced-motion: reduce){ *{ transition:none !important; scroll-behavior:auto !important; } }
 </style>
@@ -598,7 +600,7 @@ async function loadAll(){
         facilities = rows.map(r=>({
           id: r.id || ('f'+Math.random().toString(36).slice(2)),
           name: r.name || '', type: r.type || 'حلقات', area: r.area || '',
-          phone: r.phone || '', hours: r.hours || '',
+          phone: r.phone || '', hours: r.hours || '', regLink: r.regLink || '',
           lat: parseFloat(r.lat), lng: parseFloat(r.lng)
         })).filter(f=> f.name && !isNaN(f.lat) && !isNaN(f.lng));
         sheetStatus.facilities = 'connected';
@@ -673,14 +675,18 @@ function renderMarkers(list){
   list.forEach(f=>{
     if(f.lat==null || f.lng==null || isNaN(f.lat) || isNaN(f.lng)) return;
     const m = L.marker([f.lat,f.lng], {icon:purpleIcon()});
-    const phoneRow = f.phone ? `<div class="popup-row">📞 ${escapeHtml(f.phone)}</div>` : `<div class="popup-row">📞 سيتم إضافة رقم التواصل قريبًا</div>`;
+    const phoneRow = f.phone ? `<div class="popup-row">📞 ${escapeHtml(f.phone)}</div>` : '';
     const hoursRow = f.hours ? `<div class="popup-row">🕐 ${escapeHtml(f.hours)}</div>` : `<div class="popup-row">🕐 سيتم تحديد أوقات الدوام قريبًا</div>`;
+    const regRow = f.regLink ? `<a class="popup-btn" target="_blank" href="${escapeHtml(f.regLink)}" style="background:var(--gold);color:#2c2210;margin-inline-start:6px;">رابط التسجيل</a>` : '';
     m.bindPopup(`
       <div class="popup-title">${escapeHtml(f.name)}</div>
       <div class="popup-row">📍 ${escapeHtml(f.area)}</div>
       ${phoneRow}
       ${hoursRow}
-      <a class="popup-btn" target="_blank" href="${directionsUrl(f.lat,f.lng)}">احصل على الاتجاهات</a>
+      <div style="margin-top:8px;">
+        <a class="popup-btn" target="_blank" href="${directionsUrl(f.lat,f.lng)}">احصل على الاتجاهات</a>
+        ${regRow}
+      </div>
     `);
     m.on('click', ()=> setActive(f.id));
     m.addTo(markersLayer);
@@ -740,6 +746,7 @@ function renderList(){
       <div class="fc-mini-actions">
         <a href="${directionsUrl(f.lat,f.lng)}" target="_blank" onclick="event.stopPropagation()">الاتجاهات ←</a>
         ${f.phone? `&nbsp;·&nbsp;<a href="${telHref(f.phone)}" onclick="event.stopPropagation()">اتصال 📞</a>`:''}
+        ${f.regLink? `&nbsp;·&nbsp;<a href="${escapeHtml(f.regLink)}" target="_blank" onclick="event.stopPropagation()">رابط التسجيل 🔗</a>`:''}
       </div>
     </div>
   `).join('');
