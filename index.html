@@ -61,7 +61,7 @@
     display:flex; align-items:center; justify-content:space-between; gap:16px;
   }
   .brand{ display:flex; align-items:center; gap:10px; }
-  .brand-logos{ display:flex; align-items:center; gap:8px; background:#fff; border-radius:12px; padding:6px 10px; box-shadow:0 2px 6px rgba(0,0,0,0.12); }
+  .brand-logos{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.78); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,0.35); border-radius:12px; padding:6px 10px; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
   .brand-logos img{ height:44px; width:auto; display:block; }
   .brand-logos img.ministry{ height:50px; }
   .brand-text{ display:flex; flex-direction:column; }
@@ -364,6 +364,7 @@
       <span>🔍</span>
       <input type="text" id="searchInput" placeholder="ابحثي باسم الحلقة أو الحي...">
     </div>
+    <button class="btn btn-ghost" id="nearMeBtn" type="button">📍 الأقرب لموقعي</button>
     <select class="filter-select" id="typeFilter">
       <option value="">كل الأنواع</option>
       <option value="دار">دور</option>
@@ -376,6 +377,7 @@
     </select>
     <span class="result-count num" id="resultCount"></span>
   </div>
+  <div id="nearMeStatus" style="display:none;font-size:12.5px;color:var(--purple-deep);background:var(--purple-pale);padding:8px 14px;border-radius:10px;margin:-8px 0 14px;"></div>
 
   <div class="explorer-grid">
     <div class="list-panel" id="listPanel"></div>
@@ -537,6 +539,8 @@ let sheetStatus = { facilities:"default", remote:"default", settings:"default" }
 let map, markersLayer;
 let activeId = null;
 let markerRefs = {};
+let userLocation = null; // {lat, lng}
+let sortByDistance = false;
 
 /* ---------------- tiny CSV parser (handles quoted commas) ---------------- */
 function parseCSV(text){
@@ -682,16 +686,29 @@ function populateAreaFilter(){
   const sel = document.getElementById('areaFilter');
   sel.innerHTML = '<option value="">كل الأحياء</option>' + getAreas().map(a=>`<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
 }
+function haversineKm(lat1, lng1, lat2, lng2){
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
 function filteredFacilities(){
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   const type = document.getElementById('typeFilter').value;
   const area = document.getElementById('areaFilter').value;
-  return facilities.filter(f=>{
+  let list = facilities.filter(f=>{
     if(type && f.type !== type) return false;
     if(area && f.area !== area) return false;
     if(q && !(f.name.toLowerCase().includes(q) || f.area.toLowerCase().includes(q))) return false;
     return true;
   });
+  if(sortByDistance && userLocation){
+    list = list.map(f=>({...f, _distanceKm: haversineKm(userLocation.lat, userLocation.lng, f.lat, f.lng)}));
+    list.sort((a,b)=> a._distanceKm - b._distanceKm);
+  }
+  return list;
 }
 function renderList(){
   const list = filteredFacilities();
@@ -708,7 +725,7 @@ function renderList(){
         <p class="fc-name">${escapeHtml(f.name)}</p>
         <span class="fc-tag">${escapeHtml(f.type)}</span>
       </div>
-      <div class="fc-area">📍 ${escapeHtml(f.area)}</div>
+      <div class="fc-area">📍 ${escapeHtml(f.area)}${f._distanceKm!=null ? ` · <b>${f._distanceKm.toFixed(1)} كم منكِ</b>` : ''}</div>
       <div class="fc-mini-actions">
         <a href="${directionsUrl(f.lat,f.lng)}" target="_blank" onclick="event.stopPropagation()">الاتجاهات ←</a>
         ${f.phone? `&nbsp;·&nbsp;<a href="${telHref(f.phone)}" onclick="event.stopPropagation()">اتصال 📞</a>`:''}
@@ -841,6 +858,45 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('searchInput').addEventListener('input', renderList);
   document.getElementById('typeFilter').addEventListener('change', renderList);
   document.getElementById('areaFilter').addEventListener('change', renderList);
+
+  document.getElementById('nearMeBtn').addEventListener('click', ()=>{
+    if(sortByDistance){
+      // toggle off
+      sortByDistance = false;
+      userLocation = null;
+      document.getElementById('nearMeBtn').textContent = '📍 الأقرب لموقعي';
+      document.getElementById('nearMeStatus').style.display = 'none';
+      renderList();
+      return;
+    }
+    if(!navigator.geolocation){
+      showToast('متصفحك لا يدعم تحديد الموقع');
+      return;
+    }
+    const statusEl = document.getElementById('nearMeStatus');
+    statusEl.style.display = 'block';
+    statusEl.textContent = '📡 جارٍ تحديد موقعك...';
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        userLocation = {lat: pos.coords.latitude, lng: pos.coords.longitude};
+        sortByDistance = true;
+        document.getElementById('nearMeBtn').textContent = '✕ إلغاء الترتيب حسب القرب';
+        statusEl.textContent = '✅ تم ترتيب الفروع من الأقرب إلى الأبعد من موقعك';
+        renderList();
+        const nearest = filteredFacilities()[0];
+        if(nearest) setActive(nearest.id, true);
+      },
+      (err)=>{
+        statusEl.style.display = 'none';
+        if(err.code === err.PERMISSION_DENIED){
+          showToast('تم رفض إذن الوصول للموقع — يمكنك تفعيله من إعدادات المتصفح');
+        } else {
+          showToast('تعذّر تحديد موقعك، حاولي مجددًا');
+        }
+      },
+      { enableHighAccuracy:true, timeout:10000 }
+    );
+  });
 
   document.getElementById('openAdminBtn').addEventListener('click', openAdmin);
   document.getElementById('closeAdminBtn').addEventListener('click', closeAdmin);
