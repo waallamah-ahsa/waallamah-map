@@ -199,13 +199,14 @@
   .remote-card .r-row{ font-size:13px; color:var(--ink-soft); margin:3px 0; }
 
   /* ---------- cta section ---------- */
-  .cta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .cta-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px; }
   .cta-card{
     border-radius:20px; padding:32px; position:relative; overflow:hidden; color:#fff;
     display:flex; flex-direction:column; justify-content:space-between; min-height:220px;
   }
   .cta-card.join{ background:linear-gradient(135deg, var(--purple-deep), var(--purple-deeper)); }
   .cta-card.donate{ background:linear-gradient(135deg, #8a6a1f, var(--gold)); }
+  .cta-card.community{ background:linear-gradient(135deg, #1f9e5c, #12703f); }
   .cta-card h3{ font-size:24px; margin:0 0 10px; }
   .cta-card p{ font-size:14px; color:rgba(255,255,255,0.88); max-width:40ch; margin:0 0 20px; }
   .cta-card .btn{ align-self:flex-start; }
@@ -410,6 +411,13 @@
       </div>
       <a class="btn btn-solid" id="donateLink" href="#" style="background:#2c2210;color:#fff;">تبرع الآن</a>
     </div>
+    <div class="cta-card community" id="community">
+      <div>
+        <h3 id="communityTitle">انضمي لمجتمعنا على واتساب</h3>
+        <p id="communityText">تابعي أخبار الحلقات والفعاليات والتذكيرات أولًا بأول من خلال مجتمعنا على واتساب.</p>
+      </div>
+      <a class="btn btn-solid" id="communityLink" href="#" style="background:#12703f;color:#fff;">📱 انضمي الآن</a>
+    </div>
   </div>
 </section>
 
@@ -526,6 +534,9 @@ const DEFAULT_SETTINGS = {
   joinText: "سجّلي اهتمامك للالتحاق بإحدى الحلقات أو الدور القريبة منكِ، وسيتواصل معكِ الإشراف التعليمي عبر الغرف الافتراضية لاستكمال الإجراءات.",
   donateTitle: "ادعمي مسيرة القرآن",
   donateText: "تبرعك يساهم في استمرار حلقات التحفيظ ودعم المعلمات والمنشآت التعليمية في جميع أحياء الأحساء.",
+  communityLink: "",
+  communityTitle: "انضمي لمجتمعنا على واتساب",
+  communityText: "تابعي أخبار الحلقات والفعاليات والتذكيرات أولًا بأول من خلال مجتمعنا على واتساب.",
   footerLine1: "© جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه) — جميع الحقوق محفوظة",
   footerLine2: "تم إعداد هذه الخريطة لخدمة أحياء محافظة الأحساء — ١٤٤٨هـ"
 };
@@ -765,10 +776,13 @@ function renderStats(){
 function applyLinks(){
   const j = document.getElementById('joinLink');
   const d = document.getElementById('donateLink');
+  const c = document.getElementById('communityLink');
   j.href = settings.joinLink || '#join';
   d.href = settings.donateLink || '#donate';
+  c.href = settings.communityLink || '#community';
   j.onclick = settings.joinLink ? null : (e)=>{ e.preventDefault(); showToast('لم يُضف رابط التسجيل بعد'); };
   d.onclick = settings.donateLink ? null : (e)=>{ e.preventDefault(); showToast('لم يُضف رابط التبرع بعد'); };
+  c.onclick = settings.communityLink ? null : (e)=>{ e.preventDefault(); showToast('لم يُضف رابط المجتمع بعد'); };
 }
 function applyTexts(){
   document.getElementById('brandName').textContent = settings.brandName || DEFAULT_SETTINGS.brandName;
@@ -787,6 +801,8 @@ function applyTexts(){
   document.getElementById('joinText').textContent = settings.joinText || DEFAULT_SETTINGS.joinText;
   document.getElementById('donateTitle').textContent = settings.donateTitle || DEFAULT_SETTINGS.donateTitle;
   document.getElementById('donateText').textContent = settings.donateText || DEFAULT_SETTINGS.donateText;
+  document.getElementById('communityTitle').textContent = settings.communityTitle || DEFAULT_SETTINGS.communityTitle;
+  document.getElementById('communityText').textContent = settings.communityText || DEFAULT_SETTINGS.communityText;
   document.getElementById('footerLine1').textContent = settings.footerLine1 || DEFAULT_SETTINGS.footerLine1;
   document.getElementById('footerLine2').textContent = settings.footerLine2 || DEFAULT_SETTINGS.footerLine2;
 }
