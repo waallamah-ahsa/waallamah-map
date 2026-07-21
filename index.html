@@ -314,7 +314,7 @@
     <div class="header-actions">
       <a href="#join" class="btn btn-outline">انضمي لحلقاتنا</a>
       <a href="#donate" class="btn btn-gold">تبرع الآن</a>
-      <button class="icon-btn" id="openAdminBtn" title="مصدر البيانات وكيفية التحديث">ⓘ</button>
+      <button class="icon-btn" id="openAdminBtn" title="مصدر البيانات وكيفية التحديث" style="display:none;">ⓘ</button>
     </div>
   </div>
 </header>
@@ -860,6 +860,18 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   DEFAULT_LOGOS.headerAssoc = document.getElementById('headerAssocLogo').src;
   DEFAULT_LOGOS.headerMinistry = document.getElementById('headerMinistryLogo').src;
   DEFAULT_LOGOS.footerAssoc = document.getElementById('footerAssocLogo').src;
+
+  // إظهار أيقونة معلومات مصدر البيانات فقط لمن يفتح الرابط الخاص بالمنشئة،
+  // ثم تُحفظ هذه الصلاحية على نفس المتصفح فلا تحتاجين تكرار الرابط لاحقًا.
+  try{
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('admin') === '1'){
+      localStorage.setItem('waallamah_admin_view', '1');
+    }
+    if(localStorage.getItem('waallamah_admin_view') === '1'){
+      document.getElementById('openAdminBtn').style.display = 'flex';
+    }
+  }catch(e){ /* تجاهل إن تعذّر الوصول للتخزين المحلي */ }
 
   initMap();
   await loadAll();
