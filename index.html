@@ -159,6 +159,16 @@
     background:#fff; border:1px solid var(--line); border-radius:var(--radius);
     overflow-y:auto; box-shadow:var(--shadow);
   }
+  .course-results{ margin-bottom:10px; }
+  .course-results-label{ font-size:12px; font-weight:700; color:var(--gold); padding:10px 18px 4px; }
+  .course-card{
+    padding:12px 18px; border-bottom:1px solid var(--line); background:#fffaf0;
+    border-right:4px solid var(--gold);
+  }
+  .course-card .cc-name{ font-weight:700; font-size:14.5px; color:#7a5a1a; margin:0 0 3px; }
+  .course-card .cc-facility{ font-size:12.5px; color:var(--ink-soft); margin-bottom:6px; }
+  .course-card .cc-actions{ display:flex; gap:14px; }
+  .course-card .cc-actions a{ font-size:12px; font-weight:700; color:var(--gold); text-decoration:none; }
   .facility-card{
     padding:14px 18px; border-bottom:1px solid var(--line); cursor:pointer;
     transition:background .15s ease; position:relative;
@@ -197,6 +207,9 @@
   .remote-card .r-icon{ font-size:22px; color:var(--gold); margin-bottom:8px; }
   .remote-card h3{ font-family:'Tajawal',sans-serif; font-weight:700; font-size:16px; color:var(--purple-deep); margin:0 0 8px; }
   .remote-card .r-row{ font-size:13px; color:var(--ink-soft); margin:3px 0; }
+  .fee-badge{ display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .fee-badge.free{ background:#e5f4ec; color:#1f7d4f; }
+  .fee-badge.paid{ background:var(--purple-pale); color:var(--purple-deep); }
 
   /* ---------- cta section ---------- */
   .cta-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px; }
@@ -462,6 +475,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+
 /* ============================================================
    جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه) — خريطة الفروع التفاعلية
    مصدر البيانات: Google Sheets (CSV منشور) مع نسخة احتياطية مدمجة
@@ -475,7 +489,8 @@
 const SHEET_CONFIG = {
   facilitiesCsvUrl: "https://docs.google.com/spreadsheets/d/1-13Uat7oGlYRzjAXqkhmKqkEJfWY_49vFQHQimwjtdg/gviz/tq?tqx=out:csv&gid=629795420",
   remoteCsvUrl: "https://docs.google.com/spreadsheets/d/1Wn3dFPVwfhPcwhtsio0zvA5AshWVRiLsul_cg1kCPm0/gviz/tq?tqx=out:csv&gid=1844033063",
-  settingsCsvUrl: "https://docs.google.com/spreadsheets/d/1Bl_-1_DoEATOGe128HAG9qDbmtvqX3hu90w1Qz0NBgI/gviz/tq?tqx=out:csv&gid=822822053"
+  settingsCsvUrl: "https://docs.google.com/spreadsheets/d/1Bl_-1_DoEATOGe128HAG9qDbmtvqX3hu90w1Qz0NBgI/gviz/tq?tqx=out:csv&gid=822822053",
+  coursesCsvUrl: ""
 };
 
 const DEFAULT_FACILITIES = [
@@ -508,11 +523,13 @@ const DEFAULT_FACILITIES = [
 ];
 
 const DEFAULT_REMOTE = [
-  {id:"r01", name:"مقرأة الفردوس", phone:"", hours:""},
-  {id:"r02", name:"مقرأة مورد", phone:"", hours:""},
-  {id:"r03", name:"مقرأة أم عادل -رحمها الله-", phone:"", hours:""},
-  {id:"r04", name:"مقرأة قرآني نبض حياتي", phone:"", hours:""},
+  {id:"r01", name:"مقرأة الفردوس", regLink:"", hours:"", fee:""},
+  {id:"r02", name:"مقرأة مورد", regLink:"", hours:"", fee:""},
+  {id:"r03", name:"مقرأة أم عادل -رحمها الله-", regLink:"", hours:"", fee:""},
+  {id:"r04", name:"مقرأة قرآني نبض حياتي", regLink:"", hours:"", fee:""},
 ];
+
+const DEFAULT_COURSES = [];
 
 const DEFAULT_SETTINGS = {
   joinLink: "",
@@ -547,8 +564,9 @@ let DEFAULT_LOGOS = { headerAssoc:"", headerMinistry:"", footerAssoc:"" };
 
 let facilities = [...DEFAULT_FACILITIES];
 let remoteList = [...DEFAULT_REMOTE];
+let courses = [...DEFAULT_COURSES];
 let settings = {...DEFAULT_SETTINGS};
-let sheetStatus = { facilities:"default", remote:"default", settings:"default" }; // 'default' | 'connected' | 'error'
+let sheetStatus = { facilities:"default", remote:"default", settings:"default", courses:"default" }; // 'default' | 'connected' | 'error'
 let map, markersLayer;
 let activeId = null;
 let markerRefs = {};
@@ -614,7 +632,7 @@ async function loadAll(){
       if(rows.length){
         remoteList = rows.map(r=>({
           id: r.id || ('r'+Math.random().toString(36).slice(2)),
-          name: r.name || '', phone: r.phone || '', hours: r.hours || ''
+          name: r.name || '', regLink: r.regLink || '', hours: r.hours || '', fee: r.fee || ''
         })).filter(r=>r.name);
         sheetStatus.remote = 'connected';
       }
@@ -631,6 +649,19 @@ async function loadAll(){
         sheetStatus.settings = 'connected';
       }
     }catch(e){ sheetStatus.settings = 'error'; }
+  }
+  // courses (اختياري، يُستخدم فقط أثناء فترات التسجيل)
+  if(SHEET_CONFIG.coursesCsvUrl){
+    try{
+      const rows = await fetchCsv(SHEET_CONFIG.coursesCsvUrl);
+      courses = rows.map(r=>({
+        id: r.id || ('c'+Math.random().toString(36).slice(2)),
+        courseName: r.courseName || '', facilityName: r.facilityName || '', regLink: r.regLink || ''
+      })).filter(c=>c.courseName);
+      sheetStatus.courses = 'connected';
+    }catch(e){ sheetStatus.courses = 'error'; courses = []; }
+  } else {
+    courses = [...DEFAULT_COURSES];
   }
 }
 
@@ -677,15 +708,20 @@ function renderMarkers(list){
     const m = L.marker([f.lat,f.lng], {icon:purpleIcon()});
     const phoneRow = f.phone ? `<div class="popup-row">📞 ${escapeHtml(f.phone)}</div>` : '';
     const hoursRow = f.hours ? `<div class="popup-row">🕐 ${escapeHtml(f.hours)}</div>` : `<div class="popup-row">🕐 سيتم تحديد أوقات الدوام قريبًا</div>`;
-    const regRow = f.regLink ? `<a class="popup-btn" target="_blank" href="${escapeHtml(f.regLink)}" style="background:var(--gold);color:#2c2210;margin-inline-start:6px;">رابط التسجيل</a>` : '';
+    const facCourses = courses.filter(c=> f.name.includes(c.facilityName) || c.facilityName.includes(f.name));
+    const coursesRows = facCourses.length ? facCourses.map(c=>
+      `<div class="popup-row">🎓 ${escapeHtml(c.courseName)} ${c.regLink? `— <a href="${escapeHtml(c.regLink)}" target="_blank" style="color:var(--purple-deep);font-weight:700;">تسجيل</a>`:''}</div>`
+    ).join('') : '';
+    const regBtn = f.regLink ? `<a class="popup-btn" target="_blank" href="${escapeHtml(f.regLink)}" style="background:var(--gold);color:#2c2210;margin-inline-start:6px;">رابط التسجيل</a>` : '';
     m.bindPopup(`
       <div class="popup-title">${escapeHtml(f.name)}</div>
       <div class="popup-row">📍 ${escapeHtml(f.area)}</div>
       ${phoneRow}
       ${hoursRow}
+      ${coursesRows}
       <div style="margin-top:8px;">
         <a class="popup-btn" target="_blank" href="${directionsUrl(f.lat,f.lng)}">احصل على الاتجاهات</a>
-        ${regRow}
+        ${regBtn}
       </div>
     `);
     m.on('click', ()=> setActive(f.id));
@@ -727,16 +763,50 @@ function filteredFacilities(){
   }
   return list;
 }
+function matchingCourses(q){
+  if(!q || !courses.length) return [];
+  const ql = q.toLowerCase();
+  return courses.filter(c=> c.courseName.toLowerCase().includes(ql));
+}
+
+function courseCardHtml(c){
+  const facMatch = facilities.find(f=> f.name.includes(c.facilityName) || c.facilityName.includes(f.name));
+  const mapBtn = facMatch ? `<a href="#" data-fac-id="${facMatch.id}" class="cc-show-map">📍 عرض على الخريطة</a>` : '';
+  const regBtn = c.regLink ? `<a href="${escapeHtml(c.regLink)}" target="_blank">رابط التسجيل 🔗</a>` : '';
+  return `
+    <div class="course-card">
+      <p class="cc-name">🎓 ${escapeHtml(c.courseName)}</p>
+      <div class="cc-facility">📍 ${escapeHtml(c.facilityName)}</div>
+      <div class="cc-actions">${regBtn}${mapBtn}</div>
+    </div>
+  `;
+}
+
 function renderList(){
+  const q = document.getElementById('searchInput').value.trim();
   const list = filteredFacilities();
   markerRefs = renderMarkers(list);
   const panel = document.getElementById('listPanel');
   document.getElementById('resultCount').textContent = `${list.length} نتيجة`;
-  if(list.length===0){
+
+  const matchedCourses = matchingCourses(q);
+  let coursesHtml = '';
+  if(matchedCourses.length){
+    coursesHtml = `<div class="course-results"><div class="course-results-label">🎓 دورات مطابقة (${matchedCourses.length})</div>${matchedCourses.map(courseCardHtml).join('')}</div>`;
+  }
+
+  if(list.length===0 && !matchedCourses.length){
     panel.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة لبحثك.<br>جرّبي كلمة أو حيًا آخر.</div>`;
     return;
   }
-  panel.innerHTML = list.map(f=>`
+  if(list.length===0){
+    panel.innerHTML = coursesHtml + `<div class="empty-state">لا توجد فروع مطابقة، لكن وُجدت دورة مطابقة أعلاه.</div>`;
+  } else {
+    panel.innerHTML = coursesHtml + list.map(f=>{
+      const facCourses = courses.filter(c=> f.name.includes(c.facilityName) || c.facilityName.includes(f.name));
+      const courseLink = facCourses.find(c=>c.regLink);
+      const regUrl = f.regLink || (courseLink ? courseLink.regLink : '');
+      return `
     <div class="facility-card ${f.id===activeId?'active':''}" data-id="${f.id}">
       <div class="fc-row">
         <p class="fc-name">${escapeHtml(f.name)}</p>
@@ -746,12 +816,20 @@ function renderList(){
       <div class="fc-mini-actions">
         <a href="${directionsUrl(f.lat,f.lng)}" target="_blank" onclick="event.stopPropagation()">الاتجاهات ←</a>
         ${f.phone? `&nbsp;·&nbsp;<a href="${telHref(f.phone)}" onclick="event.stopPropagation()">اتصال 📞</a>`:''}
-        ${f.regLink? `&nbsp;·&nbsp;<a href="${escapeHtml(f.regLink)}" target="_blank" onclick="event.stopPropagation()">رابط التسجيل 🔗</a>`:''}
+        ${regUrl? `&nbsp;·&nbsp;<a href="${escapeHtml(regUrl)}" target="_blank" onclick="event.stopPropagation()">رابط التسجيل 🔗</a>`:''}
       </div>
     </div>
-  `).join('');
+  `;
+    }).join('');
+  }
   panel.querySelectorAll('.facility-card').forEach(el=>{
     el.addEventListener('click', ()=> setActive(el.dataset.id, true));
+  });
+  panel.querySelectorAll('.cc-show-map').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.preventDefault();
+      setActive(el.dataset.facId, true);
+    });
   });
 }
 function setActive(id, flyMap){
@@ -765,14 +843,25 @@ function setActive(id, flyMap){
 }
 function renderRemote(){
   const grid = document.getElementById('remoteGrid');
-  grid.innerHTML = remoteList.map(r=>`
+  grid.innerHTML = remoteList.map(r=>{
+    const feeVal = (r.fee||'').trim();
+    let feeBadge = '';
+    if(feeVal){
+      const isFree = /مجان|free|٠|^0$/i.test(feeVal);
+      feeBadge = `<span class="fee-badge ${isFree?'free':'paid'}">${escapeHtml(feeVal)}</span>`;
+    }
+    return `
     <div class="remote-card">
       <div class="r-icon">💻</div>
+      ${feeBadge}
       <h3>${escapeHtml(r.name)}</h3>
-      <div class="r-row">📞 ${r.phone? escapeHtml(r.phone) : 'سيتم إضافة رقم التواصل قريبًا'}</div>
       <div class="r-row">🕐 ${r.hours? escapeHtml(r.hours) : 'سيتم تحديد أوقات الدوام قريبًا'}</div>
+      ${r.regLink
+        ? `<a href="${escapeHtml(r.regLink)}" target="_blank" class="btn btn-gold" style="margin-top:10px;padding:8px 16px;font-size:12.5px;">رابط التسجيل 🔗</a>`
+        : `<div class="r-row">سيتم إضافة رابط التسجيل قريبًا</div>`}
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 function renderStats(){
   document.getElementById('statBranches').textContent = facilities.length;
@@ -824,7 +913,8 @@ function renderSheetStatus(){
   const labels = {
     facilities: 'جدول الفروع والحلقات',
     remote: 'جدول المقارئ عن بُعد',
-    settings: 'جدول النصوص والإعدادات'
+    settings: 'جدول النصوص والإعدادات',
+    courses: 'جدول الدورات (اختياري، موسمي)'
   };
   const badge = (state)=>{
     if(state==='connected') return `<span style="color:#2f7d5c;font-weight:700;">● متصل ويعمل</span>`;
@@ -938,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('adminOverlay').addEventListener('click', (e)=>{ if(e.target.id==='adminOverlay') closeAdmin(); });
   document.getElementById('refreshDataBtn').addEventListener('click', refreshAllData);
 });
+
 
 </script>
 </body>
