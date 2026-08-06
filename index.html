@@ -523,10 +523,10 @@ const DEFAULT_FACILITIES = [
 ];
 
 const DEFAULT_REMOTE = [
-  {id:"r01", name:"مقرأة الفردوس", regLink:"", hours:"", fee:""},
-  {id:"r02", name:"مقرأة مورد", regLink:"", hours:"", fee:""},
-  {id:"r03", name:"مقرأة أم عادل -رحمها الله-", regLink:"", hours:"", fee:""},
-  {id:"r04", name:"مقرأة قرآني نبض حياتي", regLink:"", hours:"", fee:""},
+  {id:"r01", name:"مقرأة الفردوس", regLink:"", hours:"", phone:"", fee:""},
+  {id:"r02", name:"مقرأة مورد", regLink:"", hours:"", phone:"", fee:""},
+  {id:"r03", name:"مقرأة أم عادل -رحمها الله-", regLink:"", hours:"", phone:"", fee:""},
+  {id:"r04", name:"مقرأة قرآني نبض حياتي", regLink:"", hours:"", phone:"", fee:""},
 ];
 
 const DEFAULT_COURSES = [];
@@ -632,7 +632,7 @@ async function loadAll(){
       if(rows.length){
         remoteList = rows.map(r=>({
           id: r.id || ('r'+Math.random().toString(36).slice(2)),
-          name: r.name || '', regLink: r.regLink || '', hours: r.hours || '', fee: r.fee || ''
+          name: r.name || '', regLink: r.regLink || '', hours: r.hours || '', phone: r.phone || '', fee: r.fee || ''
         })).filter(r=>r.name);
         sheetStatus.remote = 'connected';
       }
@@ -850,12 +850,14 @@ function renderRemote(){
       const isFree = /مجان|free|٠|^0$/i.test(feeVal);
       feeBadge = `<span class="fee-badge ${isFree?'free':'paid'}">${escapeHtml(feeVal)}</span>`;
     }
+    const phoneRow = r.phone ? `<div class="r-row">📞 <a href="${telHref(r.phone)}" style="color:inherit;text-decoration:none;">${escapeHtml(r.phone)}</a></div>` : '';
     return `
     <div class="remote-card">
       <div class="r-icon">💻</div>
       ${feeBadge}
       <h3>${escapeHtml(r.name)}</h3>
       <div class="r-row">🕐 ${r.hours? escapeHtml(r.hours) : 'سيتم تحديد أوقات الدوام قريبًا'}</div>
+      ${phoneRow}
       ${r.regLink
         ? `<a href="${escapeHtml(r.regLink)}" target="_blank" class="btn btn-gold" style="margin-top:10px;padding:8px 16px;font-size:12.5px;">رابط التسجيل 🔗</a>`
         : `<div class="r-row">سيتم إضافة رابط التسجيل قريبًا</div>`}
