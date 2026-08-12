@@ -710,7 +710,7 @@ function renderMarkers(list){
     const hoursRow = f.hours ? `<div class="popup-row">🕐 ${escapeHtml(f.hours)}</div>` : `<div class="popup-row">🕐 سيتم تحديد أوقات الدوام قريبًا</div>`;
     const facCourses = courses.filter(c=> f.name.includes(c.facilityName) || c.facilityName.includes(f.name));
     const coursesRows = facCourses.length ? facCourses.map(c=>
-      `<div class="popup-row">🎓 ${escapeHtml(c.courseName)} ${c.regLink? `— <a href="${escapeHtml(c.regLink)}" target="_blank" style="color:var(--purple-deep);font-weight:700;">تسجيل</a>`:''}</div>`
+      `<div class="popup-row">🔗 ${escapeHtml(c.courseName)} ${c.regLink? `— <a href="${escapeHtml(c.regLink)}" target="_blank" style="color:var(--purple-deep);font-weight:700;">تسجيل</a>`:''}</div>`
     ).join('') : '';
     const regBtn = f.regLink ? `<a class="popup-btn" target="_blank" href="${escapeHtml(f.regLink)}" style="background:var(--gold);color:#2c2210;margin-inline-start:6px;">رابط التسجيل</a>` : '';
     m.bindPopup(`
@@ -775,7 +775,7 @@ function courseCardHtml(c){
   const regBtn = c.regLink ? `<a href="${escapeHtml(c.regLink)}" target="_blank">رابط التسجيل 🔗</a>` : '';
   return `
     <div class="course-card">
-      <p class="cc-name">🎓 ${escapeHtml(c.courseName)}</p>
+      <p class="cc-name">🔗 ${escapeHtml(c.courseName)}</p>
       <div class="cc-facility">📍 ${escapeHtml(c.facilityName)}</div>
       <div class="cc-actions">${regBtn}${mapBtn}</div>
     </div>
@@ -792,7 +792,7 @@ function renderList(){
   const matchedCourses = matchingCourses(q);
   let coursesHtml = '';
   if(matchedCourses.length){
-    coursesHtml = `<div class="course-results"><div class="course-results-label">🎓 دورات مطابقة (${matchedCourses.length})</div>${matchedCourses.map(courseCardHtml).join('')}</div>`;
+    coursesHtml = `<div class="course-results"><div class="course-results-label">🔗 دورات مطابقة (${matchedCourses.length})</div>${matchedCourses.map(courseCardHtml).join('')}</div>`;
   }
 
   if(list.length===0 && !matchedCourses.length){
