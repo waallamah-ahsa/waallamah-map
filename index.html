@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه) | خريطة الفروع النسائية</title>
+<title>جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه) | خريطة المنشآت النسائية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
@@ -323,12 +323,12 @@
       </div>
       <div class="brand-text">
         <span class="ar-name" id="brandName">جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه)</span>
-        <span class="sub" id="brandSub">خريطة الفروع والحلقات — القسم النسائي</span>
+        <span class="sub" id="brandSub">خريطة المنشآت والحلقات — القسم النسائي</span>
       </div>
     </div>
     <div class="header-actions">
       <a href="#join" class="btn btn-outline">انضمي لحلقاتنا</a>
-      <a href="#donate" class="btn btn-gold">تبرع الآن</a>
+      <a href="#donate" class="btn btn-gold">تبرعي الآن</a>
       <button class="icon-btn" id="openAdminBtn" title="مصدر البيانات وكيفية التحديث" style="display:none;">ⓘ</button>
     </div>
   </div>
@@ -342,7 +342,7 @@
       <h1 id="heroTitle">أقرب حلقة لتحفيظ كتاب الله... على بُعد نقرة منكِ</h1>
       <p class="lead" id="heroLead">دليل تفاعلي شامل لجميع دور ومراكز وحلقات جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه)، بالإضافة إلى مقارئنا عن بُعد. اختاري حيّكِ، واعرفي أقرب حلقة، ووقت الدوام، ورقم التواصل مباشرة.</p>
       <div class="hero-ctas">
-        <a href="#explorer" class="btn btn-gold">استكشفي الفروع على الخريطة ↓</a>
+        <a href="#explorer" class="btn btn-gold">استكشفي المنشآت على الخريطة ↓</a>
         <a href="#join" class="btn btn-outline">سجلي اهتمامك بالانضمام</a>
       </div>
       <div class="stats-row">
@@ -370,9 +370,9 @@
 
 <section id="explorer">
   <div class="section-head">
-    <div class="eyebrow-line" id="explorerEyebrow">الفروع على الخريطة</div>
+    <div class="eyebrow-line" id="explorerEyebrow">المنشآت على الخريطة</div>
     <h2 id="explorerTitle">ابحثي عن أقرب حلقة إليكِ</h2>
-    <p id="explorerDesc">استخدمي البحث أو الفلاتر لتصفية الفروع حسب الحي أو نوع المنشأة، ثم اضغطي على أي فرع لعرضه على الخريطة والحصول على الاتجاهات.</p>
+    <p id="explorerDesc">استخدمي البحث أو الفلاتر لتصفية المنشآت حسب الحي أو نوع المنشأة، ثم اضغطي على أي فرع لعرضه على الخريطة والحصول على الاتجاهات.</p>
   </div>
 
   <div class="explorer-toolbar">
@@ -424,7 +424,7 @@
         <h3 id="donateTitle">ادعمي مسيرة القرآن</h3>
         <p id="donateText">تبرعك يساهم في استمرار حلقات التحفيظ ودعم المعلمات والمنشآت التعليمية في جميع أحياء الأحساء.</p>
       </div>
-      <a class="btn btn-solid" id="donateLink" href="#" style="background:#2c2210;color:#fff;">تبرع الآن</a>
+      <a class="btn btn-solid" id="donateLink" href="#" style="background:#2c2210;color:#fff;">تبرعي الآن</a>
     </div>
     <div class="cta-card community" id="community">
       <div>
@@ -453,7 +453,7 @@
   <div class="modal">
     <button class="close-x" id="closeAdminBtn">✕</button>
     <h2>مصدر بيانات الصفحة</h2>
-    <p class="modal-sub">بيانات الفروع والنصوص والشعارات تُقرأ من جداول Google Sheets الخاصة بالجمعية، حتى يمكن لأي شخص في الفريق تحديثها مباشرة دون الحاجة لتعديل كود الصفحة. إذا لم تُربط الجداول بعد، تُعرض الصفحة بالبيانات الافتراضية المدمجة فيها.</p>
+    <p class="modal-sub">بيانات المنشآت والنصوص والشعارات تُقرأ من جداول Google Sheets الخاصة بالجمعية، حتى يمكن لأي شخص في الفريق تحديثها مباشرة دون الحاجة لتعديل كود الصفحة. إذا لم تُربط الجداول بعد، تُعرض الصفحة بالبيانات الافتراضية المدمجة فيها.</p>
 
     <div id="sheetStatusList" style="margin:16px 0;"></div>
 
@@ -477,7 +477,7 @@
 <script>
 
 /* ============================================================
-   جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه) — خريطة الفروع التفاعلية
+   جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه) — خريطة المنشآت التفاعلية
    مصدر البيانات: Google Sheets (CSV منشور) مع نسخة احتياطية مدمجة
    ============================================================ */
 
@@ -538,7 +538,7 @@ const DEFAULT_SETTINGS = {
   assocLogoFooterUrl: "",
   ministryLogoUrl: "",
   brandName: "جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه)",
-  brandSub: "خريطة الفروع والحلقات — القسم النسائي",
+  brandSub: "خريطة المنشآت والحلقات — القسم النسائي",
   heroEyebrow: "٣٠ منشأة تعليمية · القسم النسائي",
   heroTitle: "أقرب حلقة لتحفيظ كتاب الله... على بُعد نقرة منكِ",
   heroLead: "دليل تفاعلي شامل لجميع دور ومراكز وحلقات جمعية تعليم القرآن وعلومه بالأحساء (وعلّمه)، بالإضافة إلى مقارئنا عن بُعد. اختاري حيّكِ، واعرفي أقرب حلقة، ووقت الدوام، ورقم التواصل مباشرة.",
@@ -546,7 +546,7 @@ const DEFAULT_SETTINGS = {
   statAreasLabel: "حيًّا بالأحساء",
   statRemoteLabel: "مقارئ عن بُعد",
   explorerTitle: "ابحثي عن أقرب حلقة إليكِ",
-  explorerDesc: "استخدمي البحث أو الفلاتر لتصفية الفروع حسب الحي أو نوع المنشأة، ثم اضغطي على أي فرع لعرضه على الخريطة والحصول على الاتجاهات.",
+  explorerDesc: "استخدمي البحث أو الفلاتر لتصفية المنشآت حسب الحي أو نوع المنشأة، ثم اضغطي على أي فرع لعرضه على الخريطة والحصول على الاتجاهات.",
   remoteTitle: "مقارئنا عن بُعد",
   remoteDesc: "لمن يفضّلن الحفظ والمراجعة من المنزل عبر الاتصال المرئي، تتوفر لدينا مقارئ متخصصة للتواصل والتسجيل.",
   joinTitle: "انضمي لحلقاتنا",
@@ -926,7 +926,7 @@ function applyLogos(){
 /* ---------------- data source info modal ---------------- */
 function renderSheetStatus(){
   const labels = {
-    facilities: 'جدول الفروع والحلقات',
+    facilities: 'جدول المنشآت والحلقات',
     remote: 'جدول المقارئ عن بُعد',
     settings: 'جدول النصوص والإعدادات',
     courses: 'جدول الدورات (اختياري، موسمي)'
@@ -1021,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         userLocation = {lat: pos.coords.latitude, lng: pos.coords.longitude};
         sortByDistance = true;
         document.getElementById('nearMeBtn').textContent = '✕ إلغاء الترتيب حسب القرب';
-        statusEl.textContent = '✅ تم ترتيب الفروع من الأقرب إلى الأبعد من موقعك';
+        statusEl.textContent = '✅ تم ترتيب المنشآت من الأقرب إلى الأبعد من موقعك';
         renderList();
         const nearest = filteredFacilities()[0];
         if(nearest) setActive(nearest.id, true);
